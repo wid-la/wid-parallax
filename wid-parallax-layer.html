@@ -108,7 +108,8 @@ Example:
     */
     _layerChanged: function () {
 
-      if (!this._parentParallax) {
+      //We need to disable parallax on safari mobile. The translateZ css transform property seems to be ignored.
+      if (!this._parentParallax || /iPad|iPhone|iPod/.test(navigator.userAgent)) {
         return;
       }
 
