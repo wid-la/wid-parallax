@@ -1,0 +1,58 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+This element should be used inside a `wid-parallax` componenet.
+It is used to represent a group of elements where a parallax effect 
+will be applied.
+
+Example:
+
+    <wid-parallax-group></wid-parallax-group>
+
+@group Wid
+@element wid-parallax-group
+@demo demo/index.html
+@hero hero.svg
+-->
+<dom-module id="wid-parallax-group">
+
+  <style>
+    :host {
+      display: block;
+      position: relative;
+      height: 100%;
+      -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+      z-index: 0;
+    }
+  </style>
+
+  <template>
+    <content></content>
+  </template>
+
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'wid-parallax-group',
+
+    properties: {
+      /**
+       * z-index of the parallax-group.
+      */
+      z: {
+        type: Number,
+        value: 0,
+        observer: '_zChanged'
+      }
+    },
+
+    /**
+     * Update the css `z-index` property.
+    */
+    _zChanged: function(){
+      this.style.zIndex = this.z + 1;
+    }
+  });
+</script>

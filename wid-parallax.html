@@ -1,0 +1,114 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="wid-parallax-group.html">
+<link rel="import" href="wid-parallax-layer.html">
+
+<!--
+This element should wrap some content to dispay a parallax effect.
+This component is inspired by http://keithclark.co.uk/articles/pure-css-parallax-websites/.
+
+Example:
+
+    <wid-parallaxr></wid-parallax>
+
+@group Wid
+@element wid-parallax
+@demo demo/index.html
+@hero hero.svg
+-->
+
+
+<dom-module id="wid-parallax">
+
+  <style>
+    :host {
+      display: block;
+      -webkit-perspective: var(--wid-parallax-perspective, 300px);
+      perspective: var(--wid-parallax-perspective, 300px);
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  </style>
+
+  <template>
+    <content></content>
+  </template>
+
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'wid-parallax',
+
+    properties: {
+      /**
+       * Css property use to do the parallax effect.
+      */
+      perspective: {
+        type: Number,
+        value: 100
+      },
+
+      /**
+       * Determines the depth of foreground parallax layers.
+       * Only apply to foreground layer (layer > 0).
+       */
+      foregroundScale: {
+        type: Number,
+        value: 5
+      },
+
+      /**
+       * Use to correct the depth.
+       * Perspective == scale seems to be a good compromise.
+       */
+      scale: {
+        type: Number,
+        value: 100
+      }
+    },
+
+    listeners: {
+      'scroll': '_onScroll'
+    },
+
+    observers: [
+      '_perspectiveChanged(perspective, foregroundScale, scale, _layers)'
+    ],
+
+    /**
+     * When the component is atteched we gather the child layer.
+     */
+    attached: function() {
+      this._layers = Polymer.dom(this).querySelectorAll('wid-parallax-layer');
+    },
+
+    /**
+     * On scroll, we update the layers.
+     */
+    _onScroll: function () {
+      var i, ii;
+
+      for (i = 0, ii = this._layers.length; i < ii; i++) {
+        this._layers[i]._updateOpacity(this.scrollTop);
+      }
+    },
+
+
+    /**
+     * Update the perspective css property.
+    */
+    _perspectiveChanged: function() {
+      var i, ii;
+
+      this.style.perspective = this.perspective + 'px';
+      this.style.WebkitPerspective = this.perspective + 'px';
+
+      for(i = 0, ii = this._layers.length; i < ii; i++) {
+        this._layers[i]._layerChanged();
+      }
+
+    }
+  });
+</script>

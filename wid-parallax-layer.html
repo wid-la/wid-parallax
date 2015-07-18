@@ -1,0 +1,123 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-media-query/iron-media-query.html">
+
+<!--
+This element should be used inside a `wid-parallax-group` element.
+It should represent an element scrolling at a specified speed.
+This element could be a background or a foreground.
+
+Example:
+
+    <wid-parallax-layer></wid-parallax-layer>
+
+@group Wid
+@element wid-parallax-layer
+@demo demo/index.html
+@hero hero.svg
+-->
+<dom-module id="wid-parallax-layer">
+
+  <style>
+    :host {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      -webkit-transform: translateZ(0) scale(1);
+      transform: translateZ(0) scale(1);
+    }
+
+    #container {
+      height: 100%;
+    }
+
+
+  </style>
+
+  <template>
+
+    <iron-media-query query="(max-width: 639px)" query-matches="{{_isMobile}}"></iron-media-query>
+    <div id="container">
+      <content></content>
+    </div>
+
+  </template>
+
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'wid-parallax-layer',
+
+    properties: {
+      /**
+       * `layer` determines whether the layer should be in the background
+       * or foreground. Negative numbers are for background, positive for
+       * foreground. Defaults to 0.
+      */
+      layer: {
+        type: Number,
+        value: 0
+      },
+
+      scrollOpaque: {
+        type: Boolean,
+        value: false,
+        observer: '_scrollOpaqueChanged'
+      }
+    },
+
+    observers: [
+      '_layerChanged(layer, _parentParallax)'
+    ],
+
+    attached: function () {
+      var node = this;
+
+      while(node.tagName.toLowerCase() !== 'wid-parallax' && node.parentNode){
+        node = node.parentNode;
+      }
+
+      this._parentParallax = node;
+    },
+
+    _updateOpacity: function (scrollTop) {
+      if (!this.scrollOpaque || this._isMobile) {
+        return;
+      }
+
+      var element = this.$.container.firstElementChild,
+          height = element.offsetHeight;
+
+      element.style.opacity = ((height - scrollTop) / height);
+    },
+
+    _scrollOpaqueChanged: function () {
+      if (this.scrollOpaque && !this._isMobile) {
+        this.style.backgroundColor = 'black';
+      } else {
+        this.style.backgroundColor = 'initial';
+      }
+    },
+
+    /**
+     * `_layerChanged` is called to update the css of the layer whenever the
+     * `layer` property is changed.
+    */
+    _layerChanged: function () {
+
+      if (!this._parentParallax) {
+        return;
+      }
+
+      var scale = this._parentParallax.scale,
+          perspective = this._parentParallax.perspective,
+          layer = (this.layer > 0) ? (1 - Math.exp(-this.layer / this._parentParallax.foregroundScale)) : this.layer;
+
+      this.style.transform = 'translateZ(' + (layer * scale) + 'px) scale(' + (1 + (layer * -scale) / perspective) + ')';
+      this.style.WebkitTransform = this.style.transform;
+    }
+  });
+</script>
