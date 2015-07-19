@@ -88,13 +88,13 @@ Example:
      * On scroll, we update the layers.
      */
     _onScroll: function () {
-      this.async(function () {
+      this.debounce('scroll', function () {
         var i, ii;
 
         for (i = 0, ii = this._layers.length; i < ii; i++) {
           this._layers[i]._updateOpacity(this.scrollTop);
         }
-      });
+      }, 3);
     },
 
     /**

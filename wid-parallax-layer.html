@@ -84,14 +84,14 @@ Example:
     },
 
     _updateOpacity: function (scrollTop) {
-      if (!this.scrollOpaque || this._isMobile) {
+      if (!this.scrollOpaque || this._isMobile || /Android|iPad|iPhone|iPod/.test(navigator.userAgent)) {
         return;
       }
 
       var element = this.$.container,
           height = element.offsetHeight;
 
-      element.style.opacity = ((height - scrollTop) / height);
+      element.style.opacity = ((height - scrollTop) / height).toFixed(2);
     },
 
     _scrollOpaqueChanged: function () {
