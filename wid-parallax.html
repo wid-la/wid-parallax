@@ -88,13 +88,14 @@ Example:
      * On scroll, we update the layers.
      */
     _onScroll: function () {
-      var i, ii;
+      this.async(function () {
+        var i, ii;
 
-      for (i = 0, ii = this._layers.length; i < ii; i++) {
-        this._layers[i]._updateOpacity(this.scrollTop);
-      }
+        for (i = 0, ii = this._layers.length; i < ii; i++) {
+          this._layers[i]._updateOpacity(this.scrollTop);
+        }
+      });
     },
-
 
     /**
      * Update the perspective css property.
