@@ -95,6 +95,7 @@ Example:
           this._layers[i]._updateOpacity(this.scrollTop);
         }
       }, 3);
+      this.fire('parallax-scroll', this.scrollTop);
     },
 
     /**
