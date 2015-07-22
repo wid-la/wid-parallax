@@ -26,6 +26,7 @@ Example:
       -webkit-perspective: var(--wid-parallax-perspective, 300px);
       perspective: var(--wid-parallax-perspective, 300px);
       height: 100%;
+      width: 100vw;
       overflow-x: hidden;
       overflow-y: auto;
     }
@@ -47,7 +48,7 @@ Example:
       */
       perspective: {
         type: Number,
-        value: 100
+        value: 1.5
       },
 
       /**
@@ -65,7 +66,7 @@ Example:
        */
       scale: {
         type: Number,
-        value: 100
+        value: 1
       }
     },
 
@@ -81,7 +82,25 @@ Example:
      * When the component is atteched we gather the child layer.
      */
     attached: function() {
+      this._groups = Polymer.dom(this).querySelectorAll('wid-parallax-group');
       this._layers = Polymer.dom(this).querySelectorAll('wid-parallax-layer');
+    },
+
+    goToGroup: function (group) {
+      var el = this,
+          nextPagePosition = this._groups[group - 1].offsetHeight,
+          currentScroll = this.scrollTop,
+          myEffect = new KeyframeEffect(el, [], {
+            duration: 500,
+            fill: 'forwards',
+            easing: 'cubic-bezier(0.42, 0, 0.57, 1.4)'
+          });
+
+      myEffect.onsample = function(timeFraction) {
+         myEffect.target.scrollTop = currentScroll + (nextPagePosition - currentScroll) * timeFraction;
+      };
+
+      document.timeline.play(myEffect);
     },
 
     /**

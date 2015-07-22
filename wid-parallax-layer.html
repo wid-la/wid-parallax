@@ -1,5 +1,4 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../iron-media-query/iron-media-query.html">
 
 <!--
 This element should be used inside a `wid-parallax-group` element.
@@ -25,6 +24,7 @@ Example:
       right: 0;
       bottom: 0;
       left: 0;
+      -ms-transform: translateZ(0) scale(1);
       -webkit-transform: translateZ(0) scale(1);
       transform: translateZ(0) scale(1);
     }
@@ -38,7 +38,6 @@ Example:
 
   <template>
 
-    <iron-media-query query="(max-width: 639px)" query-matches="{{_isMobile}}"></iron-media-query>
     <div id="container">
       <content></content>
     </div>
@@ -74,28 +73,36 @@ Example:
     ],
 
     attached: function () {
-      var node = this;
+      var node = this,
+          steps,
+          timing;
 
       while(node.tagName.toLowerCase() !== 'wid-parallax' && node.parentNode){
         node = node.parentNode;
       }
 
       this._parentParallax = node;
+
+      steps = [
+        {opacity: '1'},
+        {opacity: '0'}
+      ];
+
+      timing = {duration: 1, fill: 'both', easing: 'ease-in-out'};
+      this._opacityAnimation = this.$.container.animate(steps, timing);
+      this._opacityAnimation.pause();
     },
 
     _updateOpacity: function (scrollTop) {
-      if (!this.scrollOpaque || this._isMobile || /Android|iPad|iPhone|iPod/.test(navigator.userAgent)) {
+      if (!this.scrollOpaque || /iPad|iPhone|iPod/.test(navigator.userAgent)) { //it seems the opacity update on safari mobile is slow.
         return;
       }
 
-      var element = this.$.container,
-          height = element.offsetHeight;
-
-      element.style.opacity = ((height - scrollTop) / height).toFixed(2);
+      this._opacityAnimation.currentTime = scrollTop / this.$.container.offsetHeight;
     },
 
     _scrollOpaqueChanged: function () {
-      if (this.scrollOpaque && !this._isMobile) {
+      if (this.scrollOpaque) {
         this.style.backgroundColor = 'black';
       } else {
         this.style.backgroundColor = 'initial';
@@ -119,6 +126,7 @@ Example:
 
       this.style.transform = 'translateZ(' + (layer * scale) + 'px) scale(' + (1 + (layer * -scale) / perspective) + ')';
       this.style.WebkitTransform = this.style.transform;
+      this.style.MsTransform = this.style.transform;
     }
   });
 </script>
